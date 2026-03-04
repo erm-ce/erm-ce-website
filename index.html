@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERM-CE — Community Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0b0f;
+  --surface: #111318;
+  --surface2: #181b22;
+  --border: rgba(255,255,255,0.07);
+  --accent: #4f8ef7;
+  --accent2: #a78bfa;
+  --accent3: #34d399;
+  --warn: #f59e0b;
+  --danger: #f87171;
+  --text: #e8eaf0;
+  --muted: #6b7280;
+  --mono: 'DM Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+  --display: 'Syne', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ── Noise overlay ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4 { font-family: var(--display); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+
+/* ── Navbar ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 0 5%;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(10, 11, 15, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.logo-badge {
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
+
+.nav-cta {
+  background: var(--accent);
+  color: #fff !important;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 500 !important;
+  transition: opacity 0.2s !important;
+}
+.nav-cta:hover { opacity: 0.85; }
+
+/* ── Hero ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 5% 80px;
+  position: relative;
+}
+
+.hero-glow {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(79,142,247,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(79,142,247,0.1);
+  border: 1px solid rgba(79,142,247,0.25);
+  border-radius: 100px;
+  padding: 6px 16px;
+  font-size: 0.75rem;
+  font-family: var(--mono);
+  color: var(--accent);
+  margin-bottom: 2rem;
+  letter-spacing: 0.05em;
+}
+
+.hero-eyebrow::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+h1.hero-title {
+  font-size: clamp(3rem, 8vw, 7rem);
+  max-width: 900px;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.6) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-title .accent { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+.hero-sub {
+  max-width: 560px;
+  color: var(--muted);
+  font-size: 1.05rem;
+  margin-bottom: 3rem;
+  font-weight: 300;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 0 1px rgba(79,142,247,0.3), 0 8px 32px rgba(79,142,247,0.2);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(79,142,247,0.5), 0 16px 48px rgba(79,142,247,0.3); }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+.btn-ghost:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.03); }
+
+/* ── Stats strip ── */
+.stats-strip {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 2rem 5%;
+  display: flex;
+  justify-content: center;
+  gap: 4rem;
+  flex-wrap: wrap;
+  background: var(--surface);
+}
+
+.stat-item { text-align: center; }
+.stat-num {
+  font-family: var(--display);
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text);
+}
+.stat-label { font-size: 0.8rem; color: var(--muted); font-family: var(--mono); letter-spacing: 0.05em; }
+
+/* ── Sections ── */
+section { padding: 100px 5%; max-width: 1200px; margin: 0 auto; }
+
+.section-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.section-title {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  margin-bottom: 1rem;
+  max-width: 700px;
+}
+
+.section-sub {
+  color: var(--muted);
+  max-width: 560px;
+  font-weight: 300;
+  margin-bottom: 4rem;
+}
+
+/* ── Feature grid ── */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.feature-card {
+  background: var(--surface);
+  padding: 2.5rem;
+  transition: background 0.25s;
+  position: relative;
+}
+
+.feature-card:hover { background: var(--surface2); }
+
+.feature-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  margin-bottom: 1.25rem;
+}
+
+.feature-title {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.feature-desc { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+
+.feature-tag {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+
+/* ── Whinston showcase ── */
+.whinston-section {
+  padding: 100px 5%;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.whinston-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+
+.whinston-terminal {
+  background: #0d0e12;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+}
+
+.terminal-bar {
+  padding: 12px 16px;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+.td-r { background: #f87171; }
+.td-y { background: #fbbf24; }
+.td-g { background: #34d399; }
+
+.terminal-title { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); margin-left: auto; margin-right: auto; }
+
+.terminal-body { padding: 1.5rem; font-family: var(--mono); font-size: 0.8rem; line-height: 2; }
+
+.t-line { display: flex; gap: 1rem; }
+.t-key { color: var(--muted); min-width: 140px; }
+.t-val-green { color: var(--accent3); }
+.t-val-red { color: var(--danger); }
+.t-val-yellow { color: var(--warn); }
+.t-val-blue { color: var(--accent); }
+.t-val-purple { color: var(--accent2); }
+.t-divider { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0; }
+
+.threat-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+.threat-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent3), var(--warn), var(--danger));
+  transition: width 1s ease;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.t-btn {
+  flex: 1;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.t-btn:hover { opacity: 0.8; }
+.t-btn-warn { background: rgba(245,158,11,0.15); color: var(--warn); border: 1px solid rgba(245,158,11,0.3); }
+.t-btn-kick { background: rgba(79,142,247,0.15); color: var(--accent); border: 1px solid rgba(79,142,247,0.3); }
+.t-btn-ban { background: rgba(248,113,113,0.15); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
+
+/* ── How it works ── */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 2rem;
+  counter-reset: steps;
+}
+
+.step-card {
+  padding: 2rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  position: relative;
+  counter-increment: steps;
+}
+
+.step-card::before {
+  content: "0" counter(steps);
+  position: absolute;
+  top: -1px; right: 20px;
+  font-family: var(--display);
+  font-size: 3rem;
+  font-weight: 800;
+  color: rgba(79,142,247,0.08);
+  line-height: 1;
+}
+
+.step-num {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.1em;
+}
+
+.step-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+.step-desc { color: var(--muted); font-size: 0.875rem; }
+
+/* ── Feature details ── */
+.detail-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+  padding: 80px 0;
+  border-bottom: 1px solid var(--border);
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-row.reverse { direction: rtl; }
+.detail-row.reverse > * { direction: ltr; }
+
+.detail-visual {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mock-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface2);
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+.mock-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.mock-name { font-weight: 600; }
+.mock-sub { font-size: 0.75rem; color: var(--muted); }
+.mock-badge {
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+/* ── Pricing / Open source ── */
+.oss-banner {
+  background: linear-gradient(135deg, rgba(79,142,247,0.08) 0%, rgba(167,139,250,0.08) 100%);
+  border: 1px solid rgba(79,142,247,0.2);
+  border-radius: 20px;
+  padding: 5rem;
+  text-align: center;
+}
+
+.oss-title { font-size: clamp(2rem, 5vw, 4rem); margin-bottom: 1rem; }
+.oss-sub { color: var(--muted); max-width: 520px; margin: 0 auto 2.5rem; }
+
+/* ── Footer ── */
+footer {
+  padding: 4rem 5%;
+  border-top: 1px solid var(--border);
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 3rem;
+}
+
+.footer-brand p { color: var(--muted); font-size: 0.875rem; margin-top: 0.75rem; max-width: 280px; }
+
+.footer-col h4 { font-size: 0.8rem; font-family: var(--mono); color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; }
+
+.footer-col a { display: block; color: var(--muted); text-decoration: none; font-size: 0.875rem; margin-bottom: 0.5rem; transition: color 0.2s; }
+.footer-col a:hover { color: var(--text); }
+
+.footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 5%;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* ── Animations ── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+.animate { opacity: 0; }
+.animate.visible { animation: fadeUp 0.6s ease forwards; }
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+
+/* ── Misc ── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.pill-blue { background: rgba(79,142,247,0.12); color: var(--accent); border: 1px solid rgba(79,142,247,0.2); }
+.pill-green { background: rgba(52,211,153,0.12); color: var(--accent3); border: 1px solid rgba(52,211,153,0.2); }
+.pill-purple { background: rgba(167,139,250,0.12); color: var(--accent2); border: 1px solid rgba(167,139,250,0.2); }
+.pill-orange { background: rgba(245,158,11,0.12); color: var(--warn); border: 1px solid rgba(245,158,11,0.2); }
+
+.icon-bg-blue { background: rgba(79,142,247,0.12); }
+.icon-bg-green { background: rgba(52,211,153,0.12); }
+.icon-bg-purple { background: rgba(167,139,250,0.12); }
+.icon-bg-orange { background: rgba(245,158,11,0.12); }
+.icon-bg-red { background: rgba(248,113,113,0.12); }
+.icon-bg-cyan { background: rgba(34,211,238,0.12); }
+
+@media (max-width: 768px) {
+  nav .nav-links { display: none; }
+  .whinston-inner, .detail-row, footer { grid-template-columns: 1fr; }
+  .detail-row.reverse { direction: ltr; }
+  .stats-strip { gap: 2rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav>
+  <a href="#" class="nav-logo">
+    ERM-CE
+    <span class="logo-badge">COMMUNITY</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#whinston">Whinston Engine</a></li>
+    <li><a href="#howto">Setup</a></li>
+    <li><a href="https://github.com/ericktran-erm/erm-ce-main" target="_blank">GitHub</a></li>
+    <li><a href="/dashboard" class="nav-cta">Dashboard →</a></li>
+  </ul>
+</nav>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-eyebrow">Open Source • Self-Hostable • ER:LC Native</div>
+  <h1 class="hero-title">The <span class="accent">moderator panel</span> your server deserves</h1>
+  <p class="hero-sub">ERM-CE is the open-source community edition of the most powerful staff management bot for ER:LC Roblox servers. Free. Forever.</p>
+  <div class="hero-actions">
+    <a href="https://github.com/ericktran-erm/erm-ce-main" class="btn-primary">
+      <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      Get Started Free
+    </a>
+    <a href="/dashboard" class="btn-ghost">View Dashboard →</a>
+  </div>
+</div>
+
+<!-- ── Stats ── -->
+<div class="stats-strip">
+  <div class="stat-item">
+    <div class="stat-num" data-count="2400">2,400+</div>
+    <div class="stat-label">Active Servers</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">150k+</div>
+    <div class="stat-label">Staff Managed</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">1.2M+</div>
+    <div class="stat-label">Shifts Logged</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">99.9%</div>
+    <div class="stat-label">Uptime</div>
+  </div>
+</div>
+
+<!-- ── Features ── -->
+<section id="features">
+  <div class="section-eyebrow animate">Everything you need</div>
+  <h2 class="section-title animate delay-1">Built for serious <br>staff teams</h2>
+  <p class="section-sub animate delay-2">Every feature you'd expect from a premium bot — open source, self-hosted, and yours.</p>
+
+  <div class="features-grid">
+
+    <div class="feature-card animate">
+      <div class="feature-icon icon-bg-blue">🤖</div>
+      <div class="feature-title">Whinston Engine</div>
+      <div class="feature-desc">AI-powered instant moderation with keybind-based actions. Whinston analyzes players in real-time and gives you one-click moderation decisions.</div>
+      <span class="feature-tag pill-purple pill">AI-POWERED</span>
+    </div>
+
+    <div class="feature-card animate delay-1">
+      <div class="feature-icon icon-bg-purple">🐕</div>
+      <div class="feature-title">Watchdog</div>
+      <div class="feature-desc">Passive AI moderation that watches your server 24/7. Auto-kick mass RDM, auto-warn high KDR, and alert on suspicious join patterns.</div>
+      <span class="feature-tag pill-orange pill">AUTOMATED</span>
+    </div>
+
+    <div class="feature-card animate delay-2">
+      <div class="feature-icon icon-bg-green">🏢</div>
+      <div class="feature-title">Departments</div>
+      <div class="feature-desc">Powerful systems for managing your staff divisions. Track members, set leadership, configure quotas, and generate performance reports.</div>
+      <span class="feature-tag pill-green pill">MANAGEMENT</span>
+    </div>
+
+    <div class="feature-card animate">
+      <div class="feature-icon icon-bg-orange">⚡</div>
+      <div class="feature-title">ER:LC Integration</div>
+      <div class="feature-desc">Native integration with your ER:LC server. Run in-game commands, pull real-time player lists, view kill logs, and monitor sessions — all from Discord.</div>
+      <span class="feature-tag pill-blue pill">REAL-TIME</span>
+    </div>
+
+    <div class="feature-card animate delay-1">
+      <div class="feature-icon icon-bg-cyan">📋</div>
+      <div class="feature-title">Applications</div>
+      <div class="feature-desc">Create custom applications with Discord, Roblox, and ER:LC integrations. Automated acceptance workflows, role grants, and applicant notifications.</div>
+      <span class="feature-tag pill-blue pill">DISCORD</span>
+    </div>
+
+    <div class="feature-card animate delay-2">
+      <div class="feature-icon icon-bg-purple">📄</div>
+      <div class="feature-title">Documents</div>
+      <div class="feature-desc">Create SOPs, policies, and guides directly in your Discord. Role-based read permissions, version tracking, and category organization.</div>
+      <span class="feature-tag pill-purple pill">PERMISSIONS</span>
+    </div>
+
+    <div class="feature-card animate">
+      <div class="feature-icon icon-bg-red">🛡️</div>
+      <div class="feature-title">Infractions</div>
+      <div class="feature-desc">Log staff punishments, suspensions, and terminations with a complete audit trail. Track patterns, set thresholds, and automate escalations.</div>
+      <span class="feature-tag pill-orange pill">COMPLIANCE</span>
+    </div>
+
+    <div class="feature-card animate delay-1">
+      <div class="feature-icon icon-bg-blue">📊</div>
+      <div class="feature-title">Activity Monitor</div>
+      <div class="feature-desc">Monitor staff activity and set customizable requirements. Automated LOA handling, quota tracking, and weekly performance reports.</div>
+      <span class="feature-tag pill-green pill">ANALYTICS</span>
+    </div>
+
+    <div class="feature-card animate delay-2">
+      <div class="feature-icon icon-bg-green">📢</div>
+      <div class="feature-title">Sessions</div>
+      <div class="feature-desc">Announce sessions and monitor performance. RSVP tracking, reminder pings, host management, and post-session stats summaries.</div>
+      <span class="feature-tag pill-blue pill">EVENTS</span>
+    </div>
+
+    <div class="feature-card animate">
+      <div class="feature-icon icon-bg-orange">🔗</div>
+      <div class="feature-title">Verification</div>
+      <div class="feature-desc">Effortless Roblox onboarding with account age gates, group membership checks, and automatic role assignment via Bloxlink integration.</div>
+      <span class="feature-tag pill-green pill">ROBLOX</span>
+    </div>
+
+    <div class="feature-card animate delay-1">
+      <div class="feature-icon icon-bg-purple">🕐</div>
+      <div class="feature-title">Shift Logging</div>
+      <div class="feature-desc">Full shift start/end/break tracking with configurable shift types, per-role quotas, and shift history exports to Google Sheets.</div>
+      <span class="feature-tag pill-blue pill">CORE</span>
+    </div>
+
+    <div class="feature-card animate delay-2">
+      <div class="feature-icon icon-bg-cyan">🤖</div>
+      <div class="feature-title">Discord Bot</div>
+      <div class="feature-desc">Powerful automations across your Discord — custom commands, anti-ping protection, reminders, and full slash command support.</div>
+      <span class="feature-tag pill-purple pill">AUTOMATION</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── Whinston Engine ── -->
+<div class="whinston-section" id="whinston">
+  <div class="whinston-inner">
+    <div>
+      <div class="section-eyebrow">AI Moderation</div>
+      <h2 class="section-title">Whinston Engine</h2>
+      <p style="color: var(--muted); font-weight: 300; margin-bottom: 2rem; max-width: 460px;">
+        Our AI analyzes kill patterns, join behavior, and punishment history in seconds. 
+        Get a threat assessment and take action without ever leaving Discord.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(79,142,247,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">⚡</div>
+          <div><strong>Instant analysis</strong><br><span style="color: var(--muted); font-size: 0.875rem;">Threat assessment in under 2 seconds using live server data.</span></div>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(52,211,153,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">🎯</div>
+          <div><strong>One-click actions</strong><br><span style="color: var(--muted); font-size: 0.875rem;">Warn, kick, or ban directly from the analysis embed.</span></div>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(167,139,250,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">🔍</div>
+          <div><strong>Passive monitoring</strong><br><span style="color: var(--muted); font-size: 0.875rem;">Watch specific players and get alerted on suspicious activity.</span></div>
+        </div>
+      </div>
+      <div style="display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 0.8rem; color: var(--muted);">
+        <span style="color: var(--accent)">/whinston analyze</span> &nbsp;·&nbsp;
+        <span style="color: var(--accent)">/whinston scan</span> &nbsp;·&nbsp;
+        <span style="color: var(--accent)">/whinston monitor</span>
+      </div>
+    </div>
+
+    <div class="whinston-terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dot td-r"></div>
+        <div class="terminal-dot td-y"></div>
+        <div class="terminal-dot td-g"></div>
+        <div class="terminal-title">🤖 Whinston Engine — Analysis</div>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line"><span class="t-key">Player</span><span class="t-val-blue">xXSniper99Xx</span></div>
+        <div class="t-line"><span class="t-key">Threat Level</span><span class="t-val-red">■ CRITICAL</span></div>
+        <div class="t-line"><span class="t-key">Confidence</span><span class="t-val-green">87%</span></div>
+        <hr class="t-divider">
+        <div class="t-line"><span class="t-key">Kill/Death Ratio</span><span class="t-val-yellow">14.2 ⚠</span></div>
+        <div class="t-line"><span class="t-key">Kills (60s window)</span><span class="t-val-red">7 kills</span></div>
+        <div class="t-line"><span class="t-key">Prior Bans</span><span class="t-val-red">2 records</span></div>
+        <div class="t-line"><span class="t-key">Rapid Joins</span><span class="t-val-yellow">4 this session</span></div>
+        <hr class="t-divider">
+        <div class="t-line"><span class="t-key">Recommendation</span><span class="t-val-red">→ Ban</span></div>
+        <div class="threat-bar"><div class="threat-fill" style="width: 87%"></div></div>
+        <div class="action-buttons">
+          <button class="t-btn t-btn-warn">⚠️ Warn</button>
+          <button class="t-btn t-btn-kick">👟 Kick</button>
+          <button class="t-btn t-btn-ban">🔨 Ban</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── How it works ── -->
+<section id="howto">
+  <div class="section-eyebrow animate">Getting started</div>
+  <h2 class="section-title animate delay-1">Up and running in minutes</h2>
+  <p class="section-sub animate delay-2">ERM-CE is designed to be self-hosted with minimal setup. No paid plans. No feature gates.</p>
+
+  <div class="steps-grid">
+    <div class="step-card animate">
+      <div class="step-num">STEP 01</div>
+      <div class="step-title">Clone the repo</div>
+      <div class="step-desc">Fork or clone ERM-CE from GitHub. All source code is open and yours to modify.</div>
+    </div>
+    <div class="step-card animate delay-1">
+      <div class="step-num">STEP 02</div>
+      <div class="step-title">Configure your .env</div>
+      <div class="step-desc">Set your Discord token, MongoDB URI, and optional API keys in the .env template provided.</div>
+    </div>
+    <div class="step-card animate delay-2">
+      <div class="step-num">STEP 03</div>
+      <div class="step-title">Run the bot</div>
+      <div class="step-desc">Start with <code style="font-family:var(--mono);color:var(--accent)">python main.py</code> or use the provided shell script for production deployments.</div>
+    </div>
+    <div class="step-card animate delay-3">
+      <div class="step-num">STEP 04</div>
+      <div class="step-title">Run /setup</div>
+      <div class="step-desc">Use the guided <code style="font-family:var(--mono);color:var(--accent)">/setup</code> wizard to configure your server, roles, channels, and features.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── OSS Banner ── -->
+<section>
+  <div class="oss-banner animate">
+    <div style="font-size: 3rem; margin-bottom: 1rem;">⚙️</div>
+    <h2 class="oss-title">100% Free &amp; Open Source</h2>
+    <p class="oss-sub">ERM-CE is MIT licensed. No subscriptions, no paywalls. Fork it, modify it, make it your own. Community contributions welcome.</p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="https://github.com/ericktran-erm/erm-ce-main" class="btn-primary">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        Star on GitHub
+      </a>
+      <a href="https://discord.gg/erm" class="btn-ghost">Join Discord →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="footer-brand">
+    <div class="nav-logo" style="font-family:var(--display);font-weight:800;font-size:1.1rem;">
+      ERM-CE <span class="logo-badge" style="display:inline-block;">COMMUNITY</span>
+    </div>
+    <p>The open-source staff management solution for ER:LC Roblox communities. Free. Forever.</p>
+  </div>
+  <div class="footer-col">
+    <h4>Product</h4>
+    <a href="#features">Features</a>
+    <a href="#whinston">Whinston Engine</a>
+    <a href="#howto">Setup Guide</a>
+    <a href="/dashboard">Dashboard</a>
+  </div>
+  <div class="footer-col">
+    <h4>Resources</h4>
+    <a href="#">Documentation</a>
+    <a href="#">Self-Host Guide</a>
+    <a href="#">API Reference</a>
+    <a href="#">Changelog</a>
+  </div>
+  <div class="footer-col">
+    <h4>Community</h4>
+    <a href="https://github.com/ericktran-erm/erm-ce-main" target="_blank">GitHub</a>
+    <a href="#">Discord Server</a>
+    <a href="#">Contributors</a>
+    <a href="#">License (MIT)</a>
+  </div>
+</footer>
+
+<div class="footer-bottom">
+  <span>© 2024 ERM-CE Community Edition. MIT License.</span>
+  <span style="color: var(--muted); font-family: var(--mono); font-size: 0.75rem;">open-source community project</span>
+</div>
+
+<script>
+// ── Scroll animations ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.animate').forEach(el => observer.observe(el));
+
+// ── Threat bar animation ──
+const fill = document.querySelector('.threat-fill');
+if (fill) {
+  setTimeout(() => {
+    fill.style.width = '0%';
+    setTimeout(() => { fill.style.width = '87%'; }, 200);
+  }, 1000);
+}
+
+// ── Terminal button effects ──
+document.querySelectorAll('.t-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const orig = this.textContent;
+    this.textContent = '✓ Done';
+    this.style.opacity = '0.5';
+    setTimeout(() => {
+      this.textContent = orig;
+      this.style.opacity = '';
+    }, 1500);
+  });
+});
+</script>
+</body>
+</html>
